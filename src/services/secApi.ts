@@ -72,11 +72,9 @@ export async function updateTickerRef(): Promise<TickerRef> {
     );
   }
 
-  const raw = await response.json();
+  const data = (await response.json()) as TickerRef;
 
-  await fs.promises.writeFile(TICKER_REF, JSON.stringify(raw, null, 2));
-
-  const data = JSON.parse(String(raw)) as TickerRef;
+  await fs.promises.writeFile(TICKER_REF, JSON.stringify(data, null, 2));
 
   return data;
 }
@@ -91,7 +89,15 @@ async function readTickerRef(): Promise<TickerRef> {
 
 // Retrieve cik when passing in ticker
 async function cikByTicker(ticker: string): Promise<string> {
-  const data = await readTickerRef();
+  // Check if TICKER_REF file exists, and generate it if not
+  const tickerRefExists = await fs.promises
+    .access(TICKER_REF)
+    .then(() => true)
+    .catch(() => false);
+
+  const data = tickerRefExists
+    ? await readTickerRef()
+    : await updateTickerRef();
 
   const entry = Object.values(data).find(
     (item) => item.ticker.toUpperCase() === ticker.toUpperCase(),
