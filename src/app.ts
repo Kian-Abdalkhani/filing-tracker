@@ -5,4 +5,4 @@ import { initializeJobs } from "./scheduler/jobs.js";
 // initialize scheduler jobs
 // await initializeJobs();
 
-await latestFiling("WMT", "10-K").then(console.log);
+await latestFiling("RRGB", "10-K").then(console.log);
