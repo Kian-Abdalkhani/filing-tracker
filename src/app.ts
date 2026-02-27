@@ -5,6 +5,4 @@ import { initializeJobs } from "./scheduler/jobs.js";
 // initialize scheduler jobs
 // await initializeJobs();
 
-const filing = await latestFiling("AAPL");
-
-console.log(filing);
+await latestFiling("WMT", "10-K").then(console.log);

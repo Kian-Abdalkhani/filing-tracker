@@ -22,12 +22,14 @@ type TickerEntry = {
 type TickerRef = Record<string, TickerEntry>;
 
 type FilingData = {
+  companyName: string;
   accessionNumber: string;
   filingDate: string;
   reportDate: string;
   form: string;
   primaryDocument: string;
   isXBRL: boolean;
+  filingUrl: string;
 };
 
 type RecentFilings = {
@@ -101,18 +103,15 @@ async function cikByTicker(ticker: string): Promise<string> {
     );
   }
 
-  return String(entry.cik_str);
+  return String(entry.cik_str).padStart(10, "0");
 }
 
 // Retrieve Company's latest filing
 export async function latestFiling(ticker: string, formType?: FormType) {
-  // Default to searching for 10-K filing if form type not provided
-  if (!formType) {
-    formType = "10-K";
-  }
+  // Default to most recent filing if formType not provided
 
   const cik = await cikByTicker(ticker);
-  const submissionUrl = `https://data.sec.gov/submissions/CIK${cik.padStart(10, "0")}.json`;
+  const submissionUrl = `https://data.sec.gov/submissions/CIK${cik}.json`;
 
   const response = await fetch(submissionUrl, { headers: HEADERS });
 
@@ -124,19 +123,36 @@ export async function latestFiling(ticker: string, formType?: FormType) {
     (await response.json()) as SubmissionResponse;
   const filings = data.filings.recent;
 
-  const formIndex = filings.form.findIndex((form) => form === formType);
+  const formIndex = formType
+    ? filings.form.findIndex((form) => form === formType)
+    : 0;
   if (formIndex === -1) {
     throw new Error(`No ${formType} filings found for ticker ${ticker}`);
   }
 
+  // Forms like 3, 4, and 5 don't support the inline XBRL viewer
+  const useInlineViewer =
+    filings.isXBRL[formIndex]! === 1 &&
+    !["3", "4", "5"].includes(filings.form[formIndex]!);
+
+  const baseUrl = `https://www.sec.gov/Archives/edgar/data/${cik}/${filings.accessionNumber[formIndex]?.replaceAll("-", "")}/${filings.primaryDocument[formIndex]!}`;
+
+  const filingUrl = useInlineViewer
+    ? `https://www.sec.gov/ix?doc=/${baseUrl.split(".gov/")[1]}`
+    : baseUrl;
+
   const filing: FilingData = {
+    companyName: data.name!,
     accessionNumber: filings.accessionNumber[formIndex]!,
     filingDate: filings.filingDate[formIndex]!,
     reportDate: filings.reportDate[formIndex]!,
     form: filings.form[formIndex]!,
     primaryDocument: filings.primaryDocument[formIndex]!,
     isXBRL: filings.isXBRL[formIndex]! === 1, // convert to boolean
+    filingUrl: filingUrl,
   };
+
+  console.log(`Use the link below to access filing: \n ${filingUrl}`);
 
   return filing;
 }
