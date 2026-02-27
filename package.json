@@ -1,0 +1,25 @@
+{
+  "name": "filing-tracker",
+  "version": "1.0.0",
+  "description": "A filing tracker for SEC entities using the SEC API",
+  "license": "ISC",
+  "author": "Kian Abdalkhani",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "dev": "tsx watch src/app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/node": "^25.3.2",
+    "@types/node-cron": "^3.0.11",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "node-cron": "^4.2.1"
+  }
+}
