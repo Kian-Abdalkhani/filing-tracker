@@ -1,0 +1,1 @@
+GET http://localhost:8080/filing/latest?ticker=RRGB&formType=10-K
