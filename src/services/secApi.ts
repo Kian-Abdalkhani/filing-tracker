@@ -21,7 +21,7 @@ type TickerEntry = {
 
 type TickerRef = Record<string, TickerEntry>;
 
-type FilingData = {
+export type FilingData = {
   companyName: string;
   accessionNumber: string;
   filingDate: string;
@@ -50,7 +50,7 @@ type SubmissionResponse = {
   name?: string;
 };
 
-type FormType =
+export type FormType =
   | "10-K"
   | "10-Q"
   | "8-K"
@@ -113,7 +113,10 @@ async function cikByTicker(ticker: string): Promise<string> {
 }
 
 // Retrieve Company's latest filing
-export async function latestFiling(ticker: string, formType?: FormType) {
+export async function latestFiling(
+  ticker: string,
+  formType?: FormType,
+): Promise<FilingData> {
   // Default to most recent filing if formType not provided
 
   const cik = await cikByTicker(ticker);
