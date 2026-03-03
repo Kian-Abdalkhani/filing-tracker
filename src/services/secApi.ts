@@ -161,7 +161,5 @@ export async function latestFiling(
     filingUrl: filingUrl,
   };
 
-  console.log(`Use the link below to access filing: \n ${filingUrl}`);
-
   return filing;
 }
