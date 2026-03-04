@@ -1,11 +1,5 @@
-import dotenv from "dotenv";
 import fs from "fs";
-
-dotenv.config({ quiet: true });
-
-if (!process.env.COMPANY || !process.env.EMAIL) {
-  throw new Error("Ensure the '.env' in the project has been populated");
-}
+import {type TickerRef, type FormType, type FilingData, type SubmissionResponse} from "../types/index.js"
 
 const HEADERS = new Headers({
   "User-Agent": `${process.env.COMPANY} ${process.env.EMAIL}`,
@@ -13,51 +7,7 @@ const HEADERS = new Headers({
 
 const TICKER_REF = "tickerRef.json";
 
-type TickerEntry = {
-  cik_str: number;
-  ticker: string;
-  title: string;
-};
 
-type TickerRef = Record<string, TickerEntry>;
-
-export type FilingData = {
-  companyName: string;
-  accessionNumber: string;
-  filingDate: string;
-  reportDate: string;
-  form: string;
-  primaryDocument: string;
-  isXBRL: boolean;
-  filingUrl: string;
-};
-
-type RecentFilings = {
-  accessionNumber: string[];
-  filingDate: string[];
-  reportDate: string[];
-  form: string[];
-  primaryDocument: string[];
-  isXBRL: number[];
-};
-
-type SubmissionResponse = {
-  filings: {
-    recent: RecentFilings;
-  };
-  cik_str?: number;
-  entityType?: string;
-  name?: string;
-};
-
-export type FormType =
-  | "10-K"
-  | "10-Q"
-  | "8-K"
-  | "DEF 14A"
-  | "3"
-  | "4"
-  | "SCHEDULE 13G/A";
 
 // Update local ticker reference file store using SEC API
 export async function updateTickerRef(): Promise<TickerRef> {

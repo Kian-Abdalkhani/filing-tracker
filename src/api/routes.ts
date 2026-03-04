@@ -1,9 +1,8 @@
 import { type Express } from "express";
-import {
-  latestFiling,
-  type FilingData,
-  type FormType,
-} from "../services/secApi.js";
+import path from "path";
+import {fileURLToPath} from "url";
+import {latestFiling} from "./../services/secApi.js";
+import {type FilingData, type FormType} from '../types/index.js'
 
 export function registerRoutes(app: Express): void {
   app.get("/filing/latest", async (req, res) => {
@@ -29,5 +28,16 @@ export function registerRoutes(app: Express): void {
 
       res.status(500).json({ error: "Failed to retreive filing data." });
     }
+  });
+
+  // 
+  app.get("/download-tickers", async (req, res) => {
+
+    const __filename = fileURLToPath(import.meta.url);
+
+    const __dirname = path.dirname(__filename);
+
+    const downloadPath = path.join(__dirname, '..', '..', 'tickerRef.json');
+    res.download(downloadPath);
   });
 }
